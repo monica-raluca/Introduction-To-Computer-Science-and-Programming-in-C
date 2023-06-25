@@ -1,0 +1,166 @@
+## Copyright Birladeanu Raluca-Monica 315CAb 2022-2023
+
+## This file contains the homework description, simulating matrix calculations
+## which respect the rules that GNU Octave follows when dealing with matrices.
+
+### Definitions of main concepts and functions used while solving the problem
+
+	All calculations are done %10007 (MOD) as to avoid any overflow issues.
+	The program uses defensive programming when dynamically allocating
+matrices, algorithm which takes inspiration from code examples on the acs-pclp
+Github.
+	The program uses two structures, matrix and resizable_array.
+	
+## matrix
+It contains the matrix data (m_d), the row size (r_sz) and column size (c_sz).
+
+## resizable_array
+It contains an array storing a number of matrices, while also keeping count of
+the number of places used in the array (used), and the current size (size), the
+array resizing if necessary.
+
+	The program makes use of certain function who handle the resizable
+array and the dynamic allocation.
+
+## initialize_arr
+-> Takes one parameter, the array, and sets the used space to 0, as no matrices
+were input yet, and the size to 1, making is large enough to contain one
+matrix.
+-> Afterwards, it dynamically allocates enough space and handles possible
+errors.
+
+## dyn_matrix
+-> Takes the number of rows and columns as parameters and dynamically allocates
+a matrix with the specific number of rows and columns.
+-> If allocation fails, handles errors and frees the already allocated space.
+
+## free_matrix
+Takes two parameters, the array and its row size, and frees a dynamically 
+allocated matrix.
+
+## free_array
+Frees a resizable array and all the matrices allocated inside of it.
+
+## add_matrix
+-> If necessary, it resizes the array, then allocates space for the matrix to
+be added. 
+-> However, it does not increase the number of used spaces in the array,
+that is done manually after calling the function and adding the matrix in the
+current position (a->used).
+
+
+### Commands that the program allows, simulating the way GNU Octave works
+
+## L - load_matrix
+Takes row and column size as input from the user and allocates space for the 
+matrix, first resizing the array if necessary, and afterwards updating the
+number of used elements in the array.
+
+	The following commands (D, P, C, M, T, R, F) take the index as input
+from the user.
+	-> If there is no matrix at the given index, or if the array is empty,
+they print a message.
+	-> Otherwise: 
+## D - print_dimensions
+-> It prints the dimensions of the matrix at the given index.
+
+## P - print_matrix
+-> It prints the matrix at the given index.
+
+## C - resize_matrix
+-> It resizes the matrix at the given index, making modifications in
+place.
+	The function saves the matrix to be resized in a temporary matrix and 
+afterwards resizes the original matrix to the given dimensions input by the
+user. After resizing, only the required elements from the temporary matrix are
+copied into the new matrix. The space of the temporary matrix is then freed,
+along with the arrays saving the row and column indices.
+
+## M - multiply_matrix
+-> If the column size of the first matrix isn't equal to the row size of the
+second one, prints another message stating the fact that it cannot perform
+matrix multiplication.
+-> The product is stored in a temporary matrix (prod). Afterwards, we add
+another matrix to the array, copy the product into it and increment the number
+of used places in the array. Lastly, the temporary matrix is freed. 
+
+## T - transpose_matrix
+	## swap_variables
+	Swaps two integers using bitwise operator xor.
+-> It makes the transpose at the given index, making modifications
+in place.
+	The function saves the transpose into a temporary matrix, frees the
+space allocated to the matrix that needs to be modified, swaps the row and
+column sizes and allocates enough space for the transpose. The matrix with the
+input index is then modified in place, and the space allocated to the transpose
+is freed.
+
+## R - raise_to_power
+-> Takes the power as input from the user.
+-> If the power is negative, it prints a message stating the fact that the
+power should be positive.
+-> If the column size of the first matrix isn't equal to the row size of the
+second one, prints another message stating the fact that it cannot perform
+matrix multiplication.
+-> Otherwise, it raises the matrix to power and modifies it in place.
+	The function initializes the result to the identity matrix. The matrix
+is raised to power in logarithmic time, until the power becomes 0. The function
+uses bitwise operators to determine whether the power is odd (power & 1 != 0).
+If the last bit is set then the number is odd, otherwise it is even.
+For odd powers, the result matrix is updated and multiplied by the matrix we
+want to raise to power. The power is then halved by right-shifting: the
+least-significant bit is lost and a 0 is inserted on the other end
+(power >>= 1 being the equivalent of power /= 2). The matrix's current power is
+doubled. 
+
+## F - free_arr_matrix
+-> Frees data for the matrix stored at the given index and moves all
+the matrices one space as to not leave any blank spaces. Decreases the counter
+for used space and resizes the array if necessary.
+
+
+## O - sort_arr
+	## sum
+	Returns the sum of all elements in a given matrix.
+-> Uses a temporary variable of type matrix (temp) to swap structures, sorting
+them in ascending order using the sum of all elements in each matrix as a sort
+criteria.
+
+## Q - free_all_resources
+Frees the space allocated for all the matrices stored in the array and then 
+frees the space allocated for the resizable array and exits the program.
+
+### S - Strassen algorithm
+The algorithm uses some formulas to split the matrices. Hence, there are
+different functions implemented, which return the sum, difference and the 
+product of two matrices respectively.
+	## add_strass
+	Returns the sum matrix of two matrices.
+	## sub_strass
+	Returns the difference matrix of two matrices.
+	## mul_strass
+	Returns product matrix of two matrices.
+The Strassen algorithm uses the Divide and Conquer method, splitting the
+original matrices recursively in sub-matrices with their sizes halved. The
+recursion stops when the Strassen matrix has dimensions of 1x1, that being the
+base case.
+
+## default
+Whenever a letter that doesn't have a command linked to it is entered, the
+program prints an error message.
+
+## Thank you for reading! <3
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣴⣶⣶⣤⣄⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠾⢿⣦⣼⣿⣿⣿⣿⣿⣿⣟⡲⢶⣤⣤⣀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡤⠶⠚⠋⠁⠀⠈⠉⠀⠉⠛⠻⢿⣿⣟⣿⣿⣷⣿⣿⣿⣿⣶⣤⡀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠿⣿⣿⣟⢻⣿⣿⣿⣿⡀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⣎⣿⣿⣿⣿⡇⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡾⢀⣀⠠⠤⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⠘⣿⣿⣿⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣤⠾⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠑⠢⠤⡀⠀⠀⠀⠀⠀⠀⠀⣿⣇⣿⣿⡏⠀⠀⠀
+⠀⠀⠀⠀⣠⡴⠛⠁⠀⠀⠀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⢄⠀⠀⠀⠀⠀⢹⣷⣿⣿⠇⠀⠀⠀
+⠀⠀⣠⡿⠏⠁⠀⠀⠀⠀⠀⣾⣿⠀⣀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢦⠀⠀⢠⠿⠿⠿⠿⠄⣀⠀⠀
+⠀⣴⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠶⠦⠀⠀⠀⢀⣀⠀⠀⠀⠀⠀⠈⠓⣲⠋⠀⠀⠀⠀⠀⠀⠹⡄
+⢿⣇⠀⠀⠀⢀⣀⣠⡴⠦⣤⣄⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠟⠀⠀⠀⠀⠀⠀⠰⣏⠀⠀⠀⠀⠀⠀⠀⢠⣾
+⠀⠉⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠈⠉⠙⠛⠲⠶⠤⣤⣀⣀⣀⣼⠀⠀⠀⠀⠀⠀⠀⠙⠢⠀⢀⡀⠀⠀⠴⠋⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⠁⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⢻⣄⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠛⠶⠤⠤⠶⠒⠋⠉⠉⠉⠙⠓⠲⠾⡏⠀⠀⠀⠀
