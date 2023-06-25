@@ -1,0 +1,121 @@
+## Copyright Birladeanu Raluca-Monica 315CAb - 2022-2023
+
+## This program consists of an image editor which supports a multitude of
+commands.
+
+## Some general concepts used in the program
+	struct file_data -> Saves the image info. The image is stored in an
+array buffer and the currently selected area in sel_area. For each copy, there
+are some stored dimensions: the width and height of both the buffer and the
+selected area, the max_value and the depth (1 for greyscale, 3 for colour), as
+well as the coordinates of the selected area (x1, y1, x2, y2) and if it was
+fully selected (all - only applies if SELECT ALL command was given). The type
+and magic word are also saved.
+	clamp - if x is bigger than max, x becomes max; if it is smaller than
+min, it becomes min (used so that the values remain in the pixel range 0 - 255)
+
+## Functions for initializing and reading the file info
+	file_info - reads the file info, ignoring any comments it encounters.
+Uses getline to read an entire line. If the first character is '#', it ignores
+the line. Otherwise, it uses a variable to keep track of what values it has to
+read and reads those specific values from the line already read. Only reads the
+max value for greyscale and colour images, and it modifies the depth to 3 only
+for colour images. Initializes the dimensions of the selection and then saves
+the position where the pixel matrix starts.
+	initialize_selection -> used when the selection is the full image
+	load - Loads the file structure. It first opens the file in binary
+mode to ensure no info is lost in case the file is binary and calls the
+file_info function. After the data unrelated to the pixel matrix is read, it
+closes the file and opens it in the required mode based on the magic word.
+Afterwards, the file is set at the beginning of the pixel matrix and the
+buffer is dynamically allocated. For binary files, uses fread, and for ascii
+ones, fscanf. It then copies the array into the selected area as well, since
+after loading the pic, all of it is selected.
+
+## Functions that the program supports
+## For each function, the program first tests if there was an image loaded.
+In case there wasn't, prints the message and exits the function.
+	SELECT - can either select all, or selected an area based on the input
+coordinates
+	check_select - checks if the select_pixels command is valid, returning
+0 or 1. Reads a test_char, checks it and ungets that char if it is a valid 
+parameter. (so the whole parameter can then be read). Uses a counter which 
+increases everytime a valid parameter is read. If unvalid parameters are read,
+prints a certain message and returns 0.
+	select_pixels - Saves the coordinates into the structure, updates the
+new dimensions. If there was already a selection, frees the previously
+allocated space and reallocates it. Afterwards, only copies the required
+elements from the buffer into the selected area.
+	select_all - Updates the selected dimensions. If there was already a 
+selection, frees the previously allocated space and reallocates it. Afterwards,
+copies every element from the buffer into the selected area. 
+	HISTOGRAM - Creates the histogram for black and white images. It first
+tests if the command is valid. If it is, it tests if the bin_total is a power
+of two using bitwise operator &, and then also tests if the image is black and
+white. Saves the frequency of each value from the array, then creates the
+histogram array which saves the specific value based on the frequency. From
+there, calculates and prints the histogram based on the formula.
+	CROP - Crops the image based on the currently selected image. Frees
+the buffer, then updates its dimensions to the dimensions of the selection, 
+while also resetting the coordinates of the selection to the coordinates of
+the cropped picture (all is now selected). Afterwards, it allocates space for
+the buffer and copies the required elements from the selection.
+	EQUALIZE - Equalizez a black and white image. Uses an auxiliary array, 
+equalized, and makes the required changes. First it copies the elements from 
+the buffer, then it modifies each value using the given formula. In the end,
+it modifies both the buffer and the selected area, making them equalized.
+When the temporary array is no longer needed, it frees it.
+	APPLY - uses specific image kernels to perform different functions on
+colour images
+	check_apply - checks if the apply command is valid, returning 0 or 1.
+Works in a similar way to check_select, only with different conditions.
+	EDGE/SHARPEN/BLUR/GAUSSIAN_BLUR - Uses the specific kernel and modifies
+a temporary array temp, and afterwards copies its elements back into the buffer
+and frees temp. Additionally, it makes sure not to modify the edges.
+	SAVE - saves the current image in ascii or binary. If no other
+parameter is present, it will be binary; ascii will be specified for ascii
+files. Opens the file in the required mode and saves everything. The magic word
+gets converted to the proper one for the file type, and the values of the
+buffer are written differently depending on the file type: with fwrite for
+binary and fscanf for ascii.
+	ROTATE - uses two different functions, one for colour and one for 
+black and white images. The rotation is done multiple times, since each
+function rotates counterclockwise by 90 degrees. Hence, if the angle is
+negative, it becomes its absolute value. If it is positive, it becomes 
+360 - angle. Then the rotation is performed while the angle is larger or equal
+to 90. For angles 0, 360, -360, the matrix will remain the same.
+	basic_rotate - rotates a black and white image counterclockwise by 90
+degrees. It works differently if the image was fully selected than if the
+rotation is done on a square selection. It uses a temporary array rotated which
+is freed in the end, and both the selection and the buffer are modified.
+	EXIT - closes the program after freeing all its resources
+	
+## Difficulties encountered while developing the solution
+	Since I chose to save the image content into an array, the indices were
+slightly tricky at first, since it would have been more intuitive to use a
+matrix. However, this eases the process of dynamic allocation and error
+handling. 
+	
+## Thank you for reading, have a great day! <3
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠃⠸⠀⠀⠀⣀⣠⡄⠀⠀⠀⠁⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠘⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⣶⡶⠛⠛⠛⠟⢂⣶⣆⡀⠀⠇⠀⠀⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠆⠀⠀⠀⠀⠀⢀⣴⣿⠛⠛⢩⠇⠀⠀⠀⠀⠾⡇⠈⠻⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⢰⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⣠⠞⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠈⠀⠈⢷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠘⡄⡆⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⡉⠁⠀⣰⡟⣣⠶⠛⠙⢻⣦⠀⠀⠀⠀⠀⢀⣴⠶⠚⠳⣾⣿⡀⢠⠒⠲⡄⢀⣀⠀⠀⠇⢰⠀⠀
+⠀⠀⠀⠀⠀⠀⠄⢡⠀⢠⡿⣿⠋⠀⠀⠀⠀⠹⣧⠀⠀⠀⠀⢸⠃⠀⠀⠀⠈⣿⣇⢸⡀⠀⠙⠉⠀⢹⠀⠰⠈⠀⠀
+⠀⠀⠀⠀⠀⠀⢠⠀⠀⣼⣼⠇⠀⣰⣾⣶⠀⢀⣿⢂⣠⣄⣀⣼⡄⢰⣿⣶⡄⠸⣿⡀⢣⡀⠀⢀⣠⠎⠀⠒⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⡆⢠⣿⡿⠀⠀⢿⣿⠟⠀⢸⣿⡏⠁⠀⢙⣿⡇⠈⢿⣿⠇⠀⢻⣧⠀⠳⠖⠋⠀⠀⠀⠀⠀⠰⠀
+⡴⠉⠉⠓⠒⠒⠤⣄⡸⣿⣧⠀⠀⠀⣤⡄⠀⠀⠙⠿⠿⠿⠿⠋⠁⠀⠀⣤⡀⠀⣸⣿⣀⡤⠔⠒⠚⠉⠉⠳⡀⠀⠃
+⢧⠀⠀⠀⠀⠀⠀⠀⠉⣻⣿⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⣿⠋⠁⠀⠀⠀⠀⠀⠀⢰⠃⠀⠀
+⠘⢆⠀⠀⠀⠀⠀⠀⠈⣟⠙⠛⠷⣦⣄⣀⡀⠀⠀⢀⣀⠴⣲⢤⣀⣀⣠⣴⠾⠻⣿⠀⠀⠀⠀⠀⠀⠀⢠⠏⠀⠀⠀
+⠀⠈⢦⡀⠀⠀⠀⠀⠀⠈⢧⠀⠀⠈⠉⠋⠉⠉⠉⠉⠀⠀⠀⠀⣿⠉⠀⠀⠀⣸⢿⠀⠀⠀⠀⠀⠀⣠⠏⠀⠀⠀⠀
+⠀⠀⠀⠳⣄⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠈⢧⠀⠀⠀⢀⡼⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠈⠙⣲⠒⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⡒⠊⠉⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⢠⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣳⡀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⡀⠀⡴⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠨⡇⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡜⢀⡇⠀⠀⠀⠀⢠⠴⢤⣠⠴⠶⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠖⢻⣀⣀⣒⡇⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⡜⠀⠀⡇⠀⠀⠀⢠⠃⠀⡆⠀⠀⠀⠉⠉⣷⠀⠀⠀⠀⠀⠀⠀⢀⡎⠀⢀⠀⠀⠀⠿⣧⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣧⠀⠀⠹⡄⠀⠀⢸⠀⠀⡇⠀⠀⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⢸⠀⠀⠀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠘⠳⠤⠤⣹⣦⡀⠸⡄⠀⠹⡄⠀⠀⠀⡞⠀⠀⠀⠀⠀⠀⠀⠀⠸⡆⠀⠸⠀⢀⠼⠁⠀⢱⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠦⣄⣁⣀⣤⠾⠓⠒⠉⠉⠀⠀⠀⠉⠉⠑⠛⠢⠤⠴⠋⠀⠀⠠⠘⠀⠀⠀⠀⠀⠀⠀
