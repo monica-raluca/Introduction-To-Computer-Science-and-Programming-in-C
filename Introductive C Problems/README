@@ -1,0 +1,99 @@
+# This README contains the description of each problem in the folder.
+
+### infinite_product
+## Brief description
+The first two coordinates ai and bi are read separately. Each time new coordinates are read, the program updates the value of all required variables (ps, a_max & b_max, n_a & n_b). In the end it prints out the required values, converting them in decimal.
+
+## ps
+The scalar product is initialized with the product between the first two coordinates, and then incremented each time new coordinates are read.
+
+## a_max & b_max - initialized with -1
+first_max_a and first_max_b are the maximum values, initialized at the beginning with the first coordinates ai, and bi respectively. Each time a new coordinate is read, the program compares the maximum with the new coordinate.
+1. 
+-> If the current element is greater than first_max_a, it updates a_max (second maximum) with first_max_a value, and then updates the first_max_a as the current value.
+-> If the current variable is in between first_max_a and a_max, and it is different than first_max_a, it only updates a_max with the value of the current element.
+2. 
+-> In case the two maximum values are ever equal, tests for equality and updates the second max with -1.
+
+##n_a & n_b
+The values are initialized with ai * ai, and bi * bi respectively, and are then incremented each time new coordinates are read.
+
+
+### simple_queries
+## Brief description
+The program receives letters and prints an alert depending on some condition, or performs a specific query for the letters Q, T, E. To keep track of the frequency of each letter it uses a frequency array, indexed from 0 to 25 (L - 'a' being the index for letter L, operating with the ascii values).
+The program ends when an invalid character in introduced.
+
+## Q
+The program requests a letter and it prints said letter and its frequency.
+
+## T
+The program requests a number K and it prints the first K max values.
+	## find_max
+	The function finds the first K max values, decreasing the K each time a max is found. The max is then marked with -INT_MAX, having the smallest possible value. The function prints the character followed by a space only if that is not the last character.
+
+## E
+The program requests a letter L and it deletes all appearances of said letter (fr[L - 'a'] = 0), while also decreasing the total number of chars.
+
+## warning
+Each time a lowercase letter is read, its frequency gets increased, as well as the total number of chars (all_nr), and the number of chars read since the last warning. 
+	## unique
+	This function tests if there are at least two different letters read.
+	## freq
+	This function goes through the frequency array and prints the first letter (alphabetically) whose frequency is bigger than 0 and more than half of the total number of chars, as well as its appearance percentage as an irreducible fraction.
+	## simplification
+	This function calculates the greatest common divisor and simplifies the numerator and denominator by it, and then it prints the fraction.
+After a warning is printed, the number of chars (nr_chars) is reset to 0.
+
+
+### gigel_and_the_checkboard
+## Brief description
+The program simulates movement on a chessboard. We start at (0, 0) and move accordingly. If we are on a white square: with a positive number, we move right. Otherwise, we move left. If we are on a black square: with a positive number, we move down. Otherwise, we move up.
+The movement ends when we get to an already visited square. The program then returns the distance covered, followed by the coordinates of the square we ended up at.
+
+## colour_check
+White square have the column and row indices of the same parity, black squares don't.
+
+## distance
+The distance is being added up everytime we visit a new square. It gets incremented with the absolute value of the number in the square.
+
+## y_final
+Since the matrix indexing starts at 0 and the top left corner of the matrix is n on the chessboard, our y_final will be calculated by the formula n - i, with i being the index of the line.
+
+## x_final
+j gets incremented by 1 since indexing starts at 0. Since the English alphabet has 26 letters, while our j (column index) isn't 0, we divide j by 26 and the specific character will be the remaider of j divided by 26 (turned into a lowercase letter + 'A'). We append the character to the string x_final, add the nul terminator each time and then reverse it after there's no more characters to add.
+	## strrev
+	Reverses a string by taking a pointer starting at the beginning at the string (s1), one starting at the end of it (s2) and interchanging them as long as s1 is lower than s2.
+	## move_right & move_down
+	-> If it wouldn't move out of the matrix, increment the column/row index by the value on the square.
+	-> Otherwise, take an auxiliary variable that memorizes the number on the square and decrease from it the value necessary the get to the last column/row once. After that, use the remainder of aux divided by n (number of columns/rows) to calculate how many times you can completely cross the column/row. If said reminder is 0, we'll get to the last column/row. Otherwise, we get to the reminder - 1 (aux % n - 1).
+	## move_left & move_up
+	-> If it wouldn't move out of the matrix, decrement the column/row index by the absolute value on the square.
+	-> Otherwise, take an auxiliary variable that memorizes the absolute value of the number on the square and decrease from it the value necessary the get to the first column/row once. After that, use the remainder of aux divided by n (number of columns/rows) to calculate how many times you can completely cross the column/row. If said reminder is 0, we'll get to the first column/row. Otherwise, we get to n - the remainder (n - aux % n).
+After passing through a square, we mark it with 0, as visited.
+
+
+### another_queries
+## Brief explanation
+The program implements different tasks for a sudoku game, using all previously defined tasks to ultimately determine if a sudoku game is valid, invalid or finished.
+The number of tasks is decided by the variable M read, so tasks can be requested from the keyboard until M is 0.
+
+## Definitions of main concepts used in the problem + line & column
+
+	The variable sudoku signifies the values present on the sudoku board at a specific time and it is initialized with 0. It gets incremented while passing through the matrix, each time we encounter a value different than 0.
+	The variable poss signifies the possible values that can still be added to the sudoku board and it is initialized with n * n, the total possible number of elements in the matrix. It gets decremented while passing through the matrix, each time we encounter a value different than 0, only if said value didn't previously appear in the matrix (v[a[i][j] - 1] == 1).
+	The vector of appearances v starts with each element 1 (assuming the matrix empty) and when an element E is found in the matrix, v[E - 1] (since indexing starts at 0) will be marked with 0.
+
+## box
+The function passes through the matrix while a counter is smaller than the required index Z, incrementing it each time and saving the positions of i and j (row and column indices), stopping exactly at the beginning of the box. From there, it functions the same as the functions line and column.
+
+## cell
+-> If there is already a number in that cell, the whole vector will be 0 since no number can be placed.
+-> Otherwise, the function checks for line, column and box, using the bitwise operator & to build the vector of appearances v. The vector is initialized with 1 at first, and then the function progressively builds a temporary array which stores the values that can be used on a line/column/box. The operator & is used between the vector v and the temp array, modifying v each time: if in any of the vectors we have 0 in a position, the resulting vector v will also have 0 in that position. 
+
+## place_value
+If there is no value in a cell, adds value C.
+
+## current_state
+A sudoku game is valid only if the values in the sudoku and the possible values that can still be placed (on a line, column or box) added up are exactly equal to n * n. Hence, the function will check this rule on line, columns and boxes and return 1 if the condition doesn't apply in any one of them. More so, if it hasn't returned 1 till the last check, a variable all_sudoku will be incremented with the values in sudoku each time. Henceforth, if the variable all_sudoku is equal to n * n * n * n (meaning the sudoku has no empty cells), the game is finished. Otherwise, returns 0 (valid game, but not finished).
+
